@@ -3,6 +3,8 @@
 require 'rubygems'
 require 'mysql'
 
+require 'subscriber_logic'
+
 HOSTNAME= ""
 USERNAME= "finder"
 PASSWORD= "E7RSG9eYTwMpDsLS"
@@ -16,10 +18,10 @@ unless search_number && search_number.match(/[0-9]{10,}/)
 end
 
 products = []
-File.open("table-list.txt") do |file|
+File.open("test-list.txt") do |file|
   file.each do |line|
     table_name, field_name = line.split('#')
-    product = table_name.split('.').first
+    schema, table = table_name.split('.')
 
     begin
       st = $db.prepare("SELECT * FROM #{table_name} WHERE CAST(#{field_name} AS CHAR) LIKE ?;")
@@ -30,8 +32,10 @@ File.open("table-list.txt") do |file|
     end
 
     if st.num_rows > 0
-      products << product unless products.include?(product)
       STDERR.puts "FOUND in #{table_name}##{field_name}"
+      products << schema unless products.include?(schema)
+      x = SubscriberLogic.new(schema, table, field_name)
+      STDERR.puts x.ping
     end
   end
 end
