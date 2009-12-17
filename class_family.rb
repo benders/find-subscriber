@@ -1,6 +1,6 @@
 module ClassFamily
   def new( *args )
-    new_logic_class( *args ) || super()
+    new_logic_class( *args ) || super(*args)
   end
 
   def new_logic_class( *args )
@@ -11,8 +11,8 @@ module ClassFamily
 
     class_name = self.class_name( *args )
     klass = self.find_constant( class_name )
-    if klass && klass.respond_to?('new_logic_class')
-      klass.new
+    if klass && klass != self && klass.respond_to?('new_logic_class')
+      klass.new( *args )
     end
   end
 
