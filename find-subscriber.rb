@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -wKU
+#!/usr/bin/env ruby
 
 require 'rubygems'
 require 'mysql'
@@ -10,12 +10,16 @@ PASSWORD= "E7RSG9eYTwMpDsLS"
 $db = Mysql.new(HOSTNAME, USERNAME, PASSWORD)
 
 search_number = ARGV[0]
+unless search_number && search_number.match(/[0-9]{10,}/)
+  STDERR.puts "Usage: #{$0} <phonenumber>"
+  exit(-1)
+end
 
 products = []
 File.open("table-list.txt") do |file|
   file.each do |line|
     table_name, field_name = line.split('#')
-    product = table_name.split(/\W+/).first
+    product = table_name.split('.').first
 
     begin
       st = $db.prepare("SELECT * FROM #{table_name} WHERE CAST(#{field_name} AS CHAR) LIKE ?;")
@@ -27,14 +31,14 @@ File.open("table-list.txt") do |file|
 
     if st.num_rows > 0
       products << product unless products.include?(product)
-      STDERR.puts "FOUND in #{table_name}#{field_name}"
+      STDERR.puts "FOUND in #{table_name}##{field_name}"
     end
   end
 end
 
 puts
 if products.any?
-  puts "Subscriber #{search_number} found in #{products.join(', ')} products"
+  puts "Subscriber #{search_number} found in #{products.join(', ')}"
   exit(0)
 else
   puts "Subscriber #{search_number} NOT FOUND in any products"
