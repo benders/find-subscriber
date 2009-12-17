@@ -6,7 +6,7 @@ module ClassFamily
   def new_logic_class( *args )
     return false if args.empty?
     args.each do |arg|
-      return false if arg.nil?
+      return false if (arg.nil? || arg.empty?)
     end
 
     class_name = self.class_name( *args )

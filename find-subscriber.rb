@@ -11,8 +11,8 @@ PASSWORD= "E7RSG9eYTwMpDsLS"
 
 $db = Mysql.new(HOSTNAME, USERNAME, PASSWORD)
 
-search_number = ARGV[0]
-unless search_number && search_number.match(/[0-9]{10,}/)
+search_number = ARGV[0].chomp
+unless search_number && search_number.match(/^[0-9]{10,}$/)
   STDERR.puts "Usage: #{$0} <phonenumber>"
   exit(-1)
 end
@@ -20,7 +20,7 @@ end
 products = []
 File.open("test-list.txt") do |file|
   file.each do |line|
-    table_name, field_name = line.split('#')
+    table_name, field_name = line.chomp.split('#')
     schema, table = table_name.split('.')
 
     begin
@@ -35,7 +35,7 @@ File.open("test-list.txt") do |file|
       STDERR.puts "FOUND in #{table_name}##{field_name}"
       products << schema unless products.include?(schema)
       x = SubscriberLogic.new(schema, table, field_name)
-      STDERR.puts x.ping
+      puts x.delete_subscriber( search_number )
     end
   end
 end
