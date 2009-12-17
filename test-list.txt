@@ -1,0 +1,2 @@
+inca_proxy.subscribers#phonenumber
+alltelportal.subscribers#phonenumber
