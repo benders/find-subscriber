@@ -18,7 +18,7 @@ unless search_number && search_number.match(/^[0-9]{10,}$/)
 end
 
 products = []
-File.open("test-list.txt") do |file|
+File.open("table-list.txt") do |file|
   file.each do |line|
     table_name, field_name = line.chomp.split('#')
     schema, table = table_name.split('.')
