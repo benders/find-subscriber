@@ -41,7 +41,17 @@ module Pillphone
   module User
     class Number < SubscriberLogic
       def delete_subscriber( phonenumber )
-        "-- Pillphone subscriber should not be DB deleted"
+        <<-"SQL"
+          -- Remove Pill Phone reminders
+          DELETE FROM reminder WHERE medicine_id IN (
+            SELECT id FROM medicine WHERE user_id IN (
+              SELECT id FROM user WHERE number LIKE '%#{phonenumber}'));
+          -- Remove Pill Phone medications
+          DELETE FROM medicine WHERE user_id IN (
+            SELECT id FROM user WHERE number LIKE '%#{phonenumber}'));
+          -- Remove Pill Phone user
+          DELETE FROM user WHERE number LIKE '%#{phonenumber}'));
+        SQL
       end
     end
   end
@@ -52,7 +62,10 @@ module Pillphone
   module Settings
     class Sms < SubscriberLogic
       def delete_subscriber( phonenumber )
-        "-- Pillphone subscriber should not be DB deleted"
+        <<-"SQL"
+          -- Remove number listed as an SMS contact
+          UPDATE settings SET sms = NULL WHERE sms LIKE '%#{phonenumber}';
+        SQL
       end
     end
   end
